@@ -147,7 +147,7 @@ def db_statistics(per_frame_values):
         warnings.simplefilter("ignore", category=RuntimeWarning)
         M = np.nanmean(per_frame_values)
         O = np.nanmean(per_frame_values > 0.5)
-
+    import pdb; pdb.set_trace()
     N_bins = 4
     ids = np.round(np.linspace(1, len(per_frame_values), N_bins + 1) + 1e-10) - 1
     ids = ids.astype(np.uint8)

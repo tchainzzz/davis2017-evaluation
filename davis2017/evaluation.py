@@ -12,7 +12,7 @@ from scipy.optimize import linear_sum_assignment
 
 
 class DAVISEvaluation(object):
-    def __init__(self, davis_root, task, gt_set, sequences='all', codalab=False):
+    def __init__(self, davis_root, task, gt_set, sequences='all', codalab=False, include_unreadable=False):
         """
         Class to evaluate DAVIS sequences from a certain set and for a certain task
         :param davis_root: Path to the DAVIS folder that contains JPEGImages, Annotations, etc. folders.
@@ -23,6 +23,7 @@ class DAVISEvaluation(object):
         self.davis_root = davis_root
         self.task = task
         self.dataset = DAVIS(root=davis_root, task=task, subset=gt_set, sequences=sequences, codalab=codalab)
+        self.include_unreadable = include_unreadable
 
     @staticmethod
     def _evaluate_semisupervised(all_gt_masks, all_res_masks, all_void_masks, metric):
@@ -84,6 +85,8 @@ class DAVISEvaluation(object):
             if self.task == 'semi-supervised':
                 all_gt_masks, all_masks_id = all_gt_masks[:, 1:-1, :, :], all_masks_id[1:-1]
             all_res_masks = results.read_masks(seq, all_masks_id)
+            if all_res_masks.shape[0] == 0:
+                continue # unreadable
             if self.task == 'unsupervised':
                 j_metrics_res, f_metrics_res = self._evaluate_unsupervised(all_gt_masks, all_res_masks, all_void_masks, metric)
             elif self.task == 'semi-supervised':

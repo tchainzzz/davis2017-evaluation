@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 import sys
 
+BASE_DAVIS_PATH = "/home/tchang/davis-2017/DAVIS/Annotations/480p"
 
 class Results(object):
     def __init__(self, root_dir):
@@ -20,9 +21,13 @@ class Results(object):
             sys.exit()
 
     def read_masks(self, sequence, masks_id):
-        mask_0 = self._read_mask(sequence, masks_id[0])
+        first_frame_path = os.path.join(BASE_DAVIS_PATH, sequence, f'{masks_id[0]}.png')
+        mask_0 = np.array(Image.open(first_frame_path))
+        #mask_0 = self._read_mask(sequence, masks_id[0])
         masks = np.zeros((len(masks_id), *mask_0.shape))
         for ii, m in enumerate(masks_id):
+            if not os.path.isfile(os.path.join(self.root_dir, sequence, f"{m}.png")):
+               break 
             masks[ii, ...] = self._read_mask(sequence, m)
         num_objects = int(np.max(masks))
         tmp = np.ones((num_objects, *masks.shape))
